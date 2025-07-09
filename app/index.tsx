@@ -1,24 +1,68 @@
-import { Text, View, StyleSheet } from "react-native";
+import React, { useState } from "react";
+import { Text, View, StyleSheet, Image, TouchableOpacity } from "react-native";
 import { MaterialIcons } from '@expo/vector-icons';
 
 export default function Index() {
+  // State untuk menyimpan data gambar
+  const [images, setImages] = useState(
+    Array(9).fill().map((_, i) => ({
+      id: i,
+      mainUrl: `https://picsum.photos/200/200?random=${i}`, // Gambar utama
+      altUrl: `https://picsum.photos/201/201?random=${i}`, // Gambar alternatif
+      currentUrl: `https://picsum.photos/200/200?random=${i}`, // URL saat ini
+      scale: 1, // Skala transformasi
+    }))
+  );
+
+  // Fungsi untuk menangani klik gambar
+  const handleImagePress = (id) => {
+    setImages(prev => prev.map(img => {
+      if (img.id === id) {
+        const newScale = Math.min(img.scale * 1.2, 2); // Maksimal scale 2
+        return {
+          ...img,
+          currentUrl: img.currentUrl === img.mainUrl ? img.altUrl : img.mainUrl,
+          scale: newScale
+        };
+      }
+      return img;
+    }));
+  };
+
   return (
     <View style={styles.container}>
-      {/* Persegi panjang dengan nama */}
-      <View style={styles.rectangle}>
-        <Text style={styles.rectangleText}>Hardita</Text>
+      {/* Grid Gambar 3x3 */}
+      <View style={styles.gridContainer}>
+        {images.map((img) => (
+          <TouchableOpacity 
+            key={img.id} 
+            onPress={() => handleImagePress(img.id)}
+          >
+            <Image
+              source={{ uri: img.currentUrl }}
+              style={[
+                styles.gridImage,
+                { transform: [{ scale: img.scale }] }
+              ]}
+              resizeMode="cover"
+            />
+          </TouchableOpacity>
+        ))}
       </View>
 
-      {/* Segitiga */}
+      {/* Komponen yang sudah ada */}
+      <View style={styles.rectangle}>
+        <Image
+          source={{ uri: "https://upload.wikimedia.org/wikipedia/en/7/7a/Manchester_United_FC_crest.svg" }}
+          style={styles.image}
+          resizeMode="cover"
+        />
+      </View>
       <View style={styles.triangle} />
-
-      {/* Pil/tabung berdimensi (bukan lingkaran) */}
       <View style={styles.pill}>
         <MaterialIcons name="person" size={24} color="white" />
         <Text style={styles.pillText}>105841111722</Text>
       </View>
-
-      {/* Komponen lama */}
       <View style={{
         backgroundColor: "black",
         borderRadius: 10,
@@ -53,6 +97,20 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "#fff"
   },
+  // Style untuk grid container
+  gridContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    width: 300, // 3x100 + 3x0 border
+    marginBottom: 20,
+    justifyContent: 'center',
+  },
+  // Style untuk gambar dalam grid
+  gridImage: {
+    width: 100,
+    height: 100,
+    margin: 0,
+  },
   rectangle: {
     width: 220,
     height: 110,
@@ -63,10 +121,9 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center"
   },
-  rectangleText: {
-    fontSize: 28,
-    fontWeight: "bold",
-    color: "#222"
+  image: {
+    width: "100%",
+    height: "100%",
   },
   triangle: {
     width: 0,
@@ -84,11 +141,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "#4a90e2",
-    borderRadius: 30, // lebih kecil dari tinggi agar tetap oval, bukan lingkaran
-    paddingHorizontal: 32, // lebih panjang agar bentuknya jelas pil/tabung
+    borderRadius: 50,
+    paddingHorizontal: 24,
     paddingVertical: 12,
     marginBottom: 30,
-    minWidth: 140, // memastikan bentuk pil, bukan lingkaran
     elevation: 4,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
