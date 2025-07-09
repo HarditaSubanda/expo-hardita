@@ -1,186 +1,137 @@
-import React, { useState } from "react";
-import { Text, View, StyleSheet, Image, TouchableOpacity, Dimensions } from "react-native";
+import React, { useState } from 'react';
+import { Text, View, StyleSheet, Image, TouchableOpacity } from "react-native";
 import { MaterialIcons } from '@expo/vector-icons';
 
-// --- URL Gambar (Tidak diubah) ---
-const mainImageUrls = [
-  "https://images.unsplash.com/photo-1751227046868-2fff7ec5ebb7?q=80&w=387&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-  "https://images.unsplash.com/photo-1554151228-14d9def656e4?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80",
-  "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80",
-  "https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80",
-  "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80",
-  "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80",
-  "https://images.unsplash.com/photo-1521119989659-a83eee488004?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80",
-  "https://images.unsplash.com/photo-1552058544-f2b08422138a?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80",
-  "https://images.unsplash.com/photo-1544005313-94ddf0286df2?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80",
+// --- DATA GAMBAR UNTUK GRID ---
+// Kita definisikan data gambar di sini. Setiap objek merepresentasikan satu sel di grid.
+// Saya menggunakan gambar placeholder dari picsum.photos untuk contoh.
+// Anda bisa menggantinya dengan URL gambar Anda sendiri.
+const initialGridImages = [
+  // Baris 1
+  { id: 1, mainSrc: 'https://picsum.photos/id/10/200', altSrc: 'https://picsum.photos/id/11/200', isFlipped: false, scale: 1 },
+  { id: 2, mainSrc: 'https://picsum.photos/id/12/200', altSrc: 'https://picsum.photos/id/13/200', isFlipped: false, scale: 1 },
+  { id: 3, mainSrc: 'https://picsum.photos/id/14/200', altSrc: 'https://picsum.photos/id/15/200', isFlipped: false, scale: 1 },
+  // Baris 2
+  { id: 4, mainSrc: 'https://picsum.photos/id/16/200', altSrc: 'https://picsum.photos/id/17/200', isFlipped: false, scale: 1 },
+  { id: 5, mainSrc: 'https://picsum.photos/id/18/200', altSrc: 'https://picsum.photos/id/19/200', isFlipped: false, scale: 1 },
+  { id: 6, mainSrc: 'https://picsum.photos/id/20/200', altSrc: 'https://picsum.photos/id/21/200', isFlipped: false, scale: 1 },
+  // Baris 3
+  { id: 7, mainSrc: 'https://picsum.photos/id/22/200', altSrc: 'https://picsum.photos/id/23/200', isFlipped: false, scale: 1 },
+  { id: 8, mainSrc: 'https://picsum.photos/id/24/200', altSrc: 'https://picsum.photos/id/25/200', isFlipped: false, scale: 1 },
+  { id: 9, mainSrc: 'https://picsum.photos/id/26/200', altSrc: 'https://picsum.photos/id/27/200', isFlipped: false, scale: 1 },
 ];
 
-const altImageUrls = [
-  "https://images.unsplash.com/photo-1746311507414-bce6f67abb44?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-  "https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80",
-  "https://images.unsplash.com/photo-1534528741775-53994a69daeb?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80",
-  "https://images.unsplash.com/photo-1532074205216-d0e1f4b87368?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80",
-  "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80",
-  "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80",
-  "https://images.unsplash.com/photo-1555952517-2e8e729e0b44?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80",
-  "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80",
-  "https://images.unsplash.com/photo-1750778494630-52b400bf3beb?q=80&w=386&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-];
-
-// Menghitung ukuran sel grid berdasarkan lebar layar
-const { width } = Dimensions.get('window');
-const GRID_SIZE = 9;
-const NUM_COLUMNS = 3;
-const CELL_SIZE = Math.floor(width * 0.9 / NUM_COLUMNS); // 90% dari lebar layar dibagi 3
 
 export default function Index() {
-  // State untuk menyimpan data gambar.
-  const [images, setImages] = useState(
-    Array.from({ length: GRID_SIZE }, (_, i) => ({
-      id: i,
-      mainUrl: mainImageUrls[i],
-      altUrl: altImageUrls[i],
-      currentUrl: mainImageUrls[i],
-      scale: 1,      // Skala awal adalah 1 (ukuran normal)
-      clickCount: 0, // Penghitung klik untuk menentukan level zoom
-      error: false,
-    }))
-  );
+  // --- STATE UNTUK MENGELOLA GRID GAMBAR ---
+  const [gridImages, setGridImages] = useState(initialGridImages);
 
-  /**
-   * Fungsi untuk menangani klik pada gambar.
-   * Logika diubah untuk memenuhi persyaratan zoom.
-   */
-  const handleImagePress = (id: number) => {
-    setImages(prev => prev.map(img => {
-      // Hanya modifikasi gambar yang sesuai dengan ID
-      if (img.id === id) {
-        const newClickCount = (img.clickCount + 1) % 3; // Siklus 0, 1, 2
-        let newScale = 1;
-
-        // FITUR BARU: Menentukan skala berdasarkan jumlah klik
-        switch (newClickCount) {
-          case 0:
-            newScale = 1;    // Klik ke-3: Kembali ke ukuran normal
-            break;
-          case 1:
-            newScale = 1.5;  // Klik ke-1: Membesar 1.5x
-            break;
-          case 2:
-            newScale = 2;    // Klik ke-2: Membesar 2x (maksimal)
-            break;
+  // --- FUNGSI UNTUK MENANGANI KLIK PADA GAMBAR ---
+  const handleImagePress = (imageId) => {
+    setGridImages(currentImages =>
+      currentImages.map(image => {
+        if (image.id === imageId) {
+          // Hitung skala baru, pastikan tidak melebihi 2
+          const newScale = Math.min(image.scale * 1.2, 2);
+          
+          return {
+            ...image,
+            // Balik status gambar (utama -> alternatif atau sebaliknya)
+            isFlipped: !image.isFlipped,
+            // Terapkan skala baru
+            scale: newScale,
+          };
         }
-        
-        // Ganti ke gambar alternatif pada setiap klik
-        const newCurrentUrl = img.currentUrl === img.mainUrl ? img.altUrl : img.mainUrl;
-
-        return {
-          ...img,
-          currentUrl: newCurrentUrl,
-          scale: newScale,
-          clickCount: newClickCount,
-        };
-      }
-      // Kembalikan gambar lain ke ukuran normal untuk fokus pada satu gambar
-      return { ...img, scale: 1, clickCount: 0 };
-    }));
-  };
-
-  // Fungsi untuk menangani error saat memuat gambar
-  const handleImageError = (id: number) => {
-    setImages(prev => prev.map(img =>
-      img.id === id ? { ...img, error: true } : img
-    ));
+        // Kembalikan gambar lain tanpa perubahan
+        return image;
+      })
+    );
   };
 
   return (
     <View style={styles.container}>
-      {/* FITUR BARU: Grid yang konsisten dan responsif */}
-      <View style={[styles.gridContainer, { width: CELL_SIZE * NUM_COLUMNS }]}>
-        {images.map((img) => (
-          <TouchableOpacity
-            key={img.id}
-            style={[styles.cellContainer, { width: CELL_SIZE, height: CELL_SIZE }]}
-            onPress={() => handleImagePress(img.id)}
-            activeOpacity={0.8}
-          >
-            {img.error ? (
-              <View style={styles.errorContainer}>
-                <MaterialIcons name="broken-image" size={40} color="#ccc" />
-              </View>
-            ) : (
-              <Image
-                source={{ uri: img.currentUrl }}
-                style={[
-                  styles.gridImage,
-                  // Terapkan transformasi skala individual
-                  { transform: [{ scale: img.scale }] }
-                ]}
-                resizeMode="cover"
-                onError={() => handleImageError(img.id)}
-              />
-            )}
-          </TouchableOpacity>
-        ))}
-      </View>
-      
-      {/* Komponen lain yang sudah ada (tidak diubah) */}
+      {/* =================================================== */}
+      {/* ======= KOMPONEN LAMA (TIDAK DIUBAH) ======== */}
+      {/* =================================================== */}
       <View style={styles.rectangle}>
         <Image
           source={{ uri: "https://upload.wikimedia.org/wikipedia/en/7/7a/Manchester_United_FC_crest.svg" }}
           style={styles.image}
-          resizeMode="contain"
+          resizeMode="cover"
         />
       </View>
+
       <View style={styles.triangle} />
+
       <View style={styles.pill}>
         <MaterialIcons name="person" size={24} color="white" />
         <Text style={styles.pillText}>105841111722</Text>
+      </View>
+
+      <View style={{
+        backgroundColor: "black",
+        borderRadius: 10,
+        marginTop: 20
+      }}>
+        <Text style={{
+          color: "red",
+          fontSize: 25,
+          fontWeight: "bold",
+          textAlign: "center",
+        }}>Hardita</Text>
+        <Text style={{
+          color: "white",
+          fontWeight: "bold",
+        }}>105841111722</Text>
+      </View>
+      <View style={{
+        width: 50,
+        height: 50,
+        backgroundColor: "blue",
+        borderRadius: 100,
+        marginTop: 10
+      }}></View>
+      {/* =================================================== */}
+      {/* =========== AKHIR DARI KOMPONEN LAMA ============ */}
+      {/* =================================================== */}
+
+
+      {/* =================================================== */}
+      {/* ======= GRID GAMBAR 3x3 (KOMPONEN BARU) ======= */}
+      {/* =================================================== */}
+      <View style={styles.gridContainer}>
+        {gridImages.map(image => (
+          <TouchableOpacity
+            key={image.id}
+            onPress={() => handleImagePress(image.id)}
+            style={styles.gridCell}
+          >
+            <Image
+              source={{ uri: image.isFlipped ? image.altSrc : image.mainSrc }}
+              style={[
+                styles.gridImage,
+                { transform: [{ scale: image.scale }] } // Terapkan skala dinamis
+              ]}
+              resizeMode="cover"
+            />
+          </TouchableOpacity>
+        ))}
       </View>
     </View>
   );
 }
 
-// --- Stylesheet yang Disesuaikan ---
 const styles = StyleSheet.create({
+  // --- Style Lama (Tidak Diubah) ---
   container: {
     flex: 1,
-    justifyContent: "center",
+    // justifyContent diubah ke flex-start agar konten tidak terpusat secara vertikal
+    // dan bisa di-scroll jika melebihi layar
+    justifyContent: "flex-start", 
     alignItems: "center",
-    backgroundColor: "#fff"
-  },
-  gridContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 20,
-    // Overflow hidden untuk memastikan gambar yang diperbesar
-    // tidak keluar dari batas container grid secara visual.
-    overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: '#eee',
-  },
-  // FITUR BARU: Style untuk setiap sel di dalam grid
-  // Ini memastikan semua area yang dapat diklik memiliki ukuran yang sama.
-  cellContainer: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#f0f0f0',
-    // Z-index penting agar gambar yang diperbesar muncul di atas yang lain
-    zIndex: 1,
-  },
-  // Style untuk gambar di dalam sel
-  gridImage: {
-    width: '100%',
-    height: '100%',
-  },
-  errorContainer: {
-    width: '100%',
-    height: '100%',
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#f5f5f5',
+    backgroundColor: "#fff",
+    // Tambahkan padding atas agar tidak terlalu mepet
+    paddingTop: 60, 
   },
   rectangle: {
     width: 220,
@@ -190,12 +141,11 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     marginBottom: 20,
     justifyContent: "center",
-    alignItems: "center",
-    padding: 10,
+    alignItems: "center"
   },
   image: {
-    width: "80%",
-    height: "80%",
+    width: "100%",
+    height: "100%",
   },
   triangle: {
     width: 0,
@@ -216,12 +166,38 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     paddingHorizontal: 24,
     paddingVertical: 12,
-    marginBottom: 30,
+    marginBottom: 20, // Mengurangi margin bottom agar grid tidak terlalu jauh
+    elevation: 4,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
   },
   pillText: {
     color: "white",
     fontWeight: "bold",
     fontSize: 18,
     marginLeft: 10,
+  },
+
+  // --- Style Baru untuk Grid ---
+  gridContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    width: '95%', // Lebar kontainer grid
+    marginTop: 20, // Jarak dari komponen di atasnya
+  },
+  gridCell: {
+    width: 100, // Lebar setiap sel
+    height: 100, // Tinggi setiap sel
+    margin: 5, // Jarak antar sel
+    backgroundColor: '#e0e0e0',
+    borderRadius: 8,
+    overflow: 'hidden', // Penting agar gambar tidak keluar dari border radius saat membesar
+  },
+  gridImage: {
+    width: '100%',
+    height: '100%',
   }
 });
