@@ -5,7 +5,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 export default function Index() {
   // State untuk menyimpan data gambar
   const [images, setImages] = useState(
-    Array(9).fill().map((_, i) => ({
+  Array.from({ length: 9 }, (_, i) => ({
       id: i,
       mainUrl: `https://picsum.photos/200/200?random=${i}`, // Gambar utama
       altUrl: `https://picsum.photos/201/201?random=${i}`, // Gambar alternatif
@@ -15,7 +15,7 @@ export default function Index() {
   );
 
   // Fungsi untuk menangani klik gambar
-  const handleImagePress = (id) => {
+  const handleImagePress = (id : number) => {
     setImages(prev => prev.map(img => {
       if (img.id === id) {
         const newScale = Math.min(img.scale * 1.2, 2); // Maksimal scale 2
