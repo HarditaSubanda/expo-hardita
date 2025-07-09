@@ -2,10 +2,9 @@ import React, { useState } from "react";
 import { Text, View, StyleSheet, Image, TouchableOpacity } from "react-native";
 import { MaterialIcons } from '@expo/vector-icons';
 
-// --- URL Gambar Statis ---
-// Mendefinisikan 9 URL gambar utama yang akan digunakan dalam grid.
+// Mendefinisikan URL gambar utama dan alternatif secara statis
 const mainImageUrls = [
-  "https://images.unsplash.com/photo-1549492423-400259a5e5a4?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80",
+  "https://images.unsplash.com/photo-1750688650545-d9e2a060dfe8?q=80&w=806&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
   "https://images.unsplash.com/photo-1554151228-14d9def656e4?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80",
   "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80",
   "https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80",
@@ -16,9 +15,8 @@ const mainImageUrls = [
   "https://images.unsplash.com/photo-1544005313-94ddf0286df2?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80",
 ];
 
-// Mendefinisikan 9 URL gambar alternatif yang akan digunakan saat gambar utama diklik.
 const altImageUrls = [
-  "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80",
+  "https://images.unsplash.com/photo-1750778494630-52b400bf3beb?q=80&w=386&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
   "https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80",
   "https://images.unsplash.com/photo-1534528741775-53994a69daeb?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80",
   "https://images.unsplash.com/photo-1532074205216-d0e1f4b87368?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80",
@@ -26,34 +24,34 @@ const altImageUrls = [
   "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80",
   "https://images.unsplash.com/photo-1555952517-2e8e729e0b44?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80",
   "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80",
-  "https://images.unsplash.com/photo-1488161628813-04466f872d24?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80",
+  "https://images.unsplash.com/photo-1750755072927-4221f5018635?q=80&w=876&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
 ];
 
-
 export default function Index() {
-  // State untuk menyimpan data gambar, diinisialisasi dengan URL statis.
+  // State untuk menyimpan data gambar.
+  // Setiap objek gambar memiliki properti 'scale' sendiri untuk penskalaan individual.
   const [images, setImages] = useState(
     Array.from({ length: 9 }, (_, i) => ({
       id: i,
       mainUrl: mainImageUrls[i],
       altUrl: altImageUrls[i],
       currentUrl: mainImageUrls[i],
-      scale: 1,
-      error: false, // State baru untuk melacak error pemuatan gambar.
+      scale: 1, // Skala awal untuk setiap gambar
+      error: false,
     }))
   );
 
   // Fungsi untuk menangani klik pada gambar.
   const handleImagePress = (id: number) => {
     setImages(prev => prev.map(img => {
+      // Hanya modifikasi gambar yang sesuai dengan ID yang diklik.
       if (img.id === id) {
-        // Memperbesar skala gambar, maksimal 2x.
-        const newScale = Math.min(img.scale * 1.2, 2); 
-        // Mengganti URL gambar antara mainUrl dan altUrl.
+        // FITUR: Penskalaan 1.2x dan pembatasan maksimum 2x.
+        const newScale = Math.min(img.scale * 1.2, 2);
         return {
           ...img,
           currentUrl: img.currentUrl === img.mainUrl ? img.altUrl : img.mainUrl,
-          scale: newScale
+          scale: newScale // Terapkan skala baru
         };
       }
       return img;
@@ -76,7 +74,6 @@ export default function Index() {
             key={img.id}
             onPress={() => handleImagePress(img.id)}
           >
-            {/* Tampilkan ikon error jika gambar gagal dimuat, jika tidak, tampilkan gambar. */}
             {img.error ? (
               <View style={[styles.gridImage, styles.errorContainer]}>
                 <MaterialIcons name="broken-image" size={40} color="#ccc" />
@@ -86,17 +83,18 @@ export default function Index() {
                 source={{ uri: img.currentUrl }}
                 style={[
                   styles.gridImage,
+                  // Terapkan transformasi skala individual
                   { transform: [{ scale: img.scale }] }
                 ]}
                 resizeMode="cover"
-                onError={() => handleImageError(img.id)} // Panggil fungsi penanganan error jika pemuatan gagal.
+                onError={() => handleImageError(img.id)}
               />
             )}
           </TouchableOpacity>
         ))}
       </View>
 
-      {/* Komponen yang sudah ada sebelumnya */}
+      {/* Komponen yang sudah ada */}
       <View style={styles.rectangle}>
         <Image
           source={{ uri: "https://upload.wikimedia.org/wikipedia/en/7/7a/Manchester_United_FC_crest.svg" }}
@@ -143,7 +141,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "#fff"
   },
-  // Style untuk grid container.
   gridContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -151,14 +148,13 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     justifyContent: 'center',
   },
-  // Style untuk gambar dalam grid, memastikan ukuran yang sama persis.
+  // FITUR: Memastikan semua sel gambar memiliki ukuran yang sama.
   gridImage: {
     width: 100,  // Lebar gambar tetap
     height: 100, // Tinggi gambar tetap
     margin: 0,
-    backgroundColor: '#f0f0f0', // Warna latar belakang untuk placeholder
+    backgroundColor: '#f0f0f0',
   },
-  // Style untuk container error.
   errorContainer: {
     justifyContent: 'center',
     alignItems: 'center',
