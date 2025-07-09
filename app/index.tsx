@@ -1,22 +1,18 @@
-import { Text, View, StyleSheet, Image } from "react-native";
+import { Text, View, StyleSheet } from "react-native";
 import { MaterialIcons } from '@expo/vector-icons';
 
 export default function Index() {
   return (
     <View style={styles.container}>
-      {/* Persegi panjang dengan gambar */}
+      {/* Persegi panjang dengan nama */}
       <View style={styles.rectangle}>
-        <Image
-          source={{ uri: "https://upload.wikimedia.org/wikipedia/en/7/7a/Manchester_United_FC_crest.svg" }}
-          style={styles.image}
-          resizeMode="cover"
-        />
+        <Text style={styles.rectangleText}>Hardita</Text>
       </View>
 
       {/* Segitiga */}
       <View style={styles.triangle} />
 
-      {/* Pil/tabung berdimensi */}
+      {/* Pil/tabung berdimensi (bukan lingkaran) */}
       <View style={styles.pill}>
         <MaterialIcons name="person" size={24} color="white" />
         <Text style={styles.pillText}>105841111722</Text>
@@ -67,9 +63,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center"
   },
-  image: {
-    width: "100%",
-    height: "100%",
+  rectangleText: {
+    fontSize: 28,
+    fontWeight: "bold",
+    color: "#222"
   },
   triangle: {
     width: 0,
@@ -87,11 +84,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "#4a90e2",
-    borderRadius: 50,
-    paddingHorizontal: 24,
+    borderRadius: 30, // lebih kecil dari tinggi agar tetap oval, bukan lingkaran
+    paddingHorizontal: 32, // lebih panjang agar bentuknya jelas pil/tabung
     paddingVertical: 12,
     marginBottom: 30,
-    elevation: 4, // efek dimensi (shadow)
+    minWidth: 140, // memastikan bentuk pil, bukan lingkaran
+    elevation: 4,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
