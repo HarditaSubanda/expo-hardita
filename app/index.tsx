@@ -6,7 +6,18 @@ import { useFonts } from 'expo-font';
 // --- BAGIAN LOGIKA TUGAS ---
 
 // 1. Daftar nama mahasiswa (gantilah dengan daftar nama yang sebenarnya)
-const daftarNama = Array.from({ length: 130 }, (_, i) => `Nama Mahasiswa ${i + 1}`);
+const daftarNama = Array.from({ length: 130 }, (_, i) => {
+  const nomor = i + 1;
+  switch (nomor) {
+    case 113: return "113 M.RAY TOGUBU";
+    case 114: return "114 JEY JEY ASBAR";
+    case 115: return "115 REZKI ASRIANI";
+    case 118: return "118 ARI AHMAD DAHRIL";
+    case 121: return "121 ANNISA ALFRINI";
+    case 122: return "122 DZULVIANA";
+    default: return `${nomor} tidak diketahui`;
+  }
+});
 
 // 2. Fungsi untuk mendapatkan nama sebelum dan sesudah urutan tertentu
 const getNamaSekitar = (urutan: number, total: number, sebelum: number, sesudah: number) => {
@@ -69,6 +80,19 @@ export default function Index() {
     'PlayfairDisplay-Variable': require('../assets/fonts/PlayfairDisplay-VariableFont_wght.ttf'),
   });
 
+  const namaFonts = [
+  'Poppins-Regular',
+  'Poppins-Bold',
+  'Oswald-Regular',
+  'Lato-Regular',
+  'Lato-Bold',
+  'RobotoFlex-Variable',
+  'Inter-Variable',
+  'Montserrat-Variable',
+  'SourceSans3-Variable',
+  'PlayfairDisplay-Variable',
+];
+
   const handleImagePress = (imageId: number) => {
     setGridImages(currentImages =>
       currentImages.map(image => {
@@ -109,14 +133,30 @@ export default function Index() {
 
       {/* --- BAGIAN TAMPILAN NAMA (BARU) --- */}
       <View style={styles.namaContainer}>
-        <Text style={styles.namaHeader}>5 Nama Sebelum (Urutan 117)</Text>
-        {namaSebelum.map((nama, index) => (
-          <Text key={index} style={[styles.namaItem, { fontFamily: 'Poppins-Regular' }]}>{116 - index}. {nama}</Text>
-        ))}
+      <Text style={styles.namaHeader}>5 Nama Sebelum (Urutan 117)</Text>
+      {namaSebelum.map((nama, index) => (
+        <Text
+          key={index}
+          style={[
+            styles.namaItem,
+            { fontFamily: namaFonts[index] }
+          ]}
+        >
+          {116 - index}. {nama}
+        </Text>
+      ))}
 
         <Text style={styles.namaHeader}>5 Nama Setelah (Urutan 117)</Text>
         {namaSesudah.map((nama, index) => (
-          <Text key={index} style={[styles.namaItem, { fontFamily: 'RobotoFlex-Variable', fontWeight: '600' }]}>{118 + index}. {nama}</Text>
+          <Text
+            key={index}
+            style={[
+              styles.namaItem,
+              { fontFamily: namaFonts[index + 5] }
+            ]}
+          >
+            {118 + index}. {nama}
+          </Text>
         ))}
       </View>
 
