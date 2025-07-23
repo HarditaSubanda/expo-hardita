@@ -1,7 +1,41 @@
 import React, { useState } from 'react';
-import { Text, View, StyleSheet, Image, TouchableOpacity, ScrollView } from "react-native";
+import { Text, View, StyleSheet, Image, TouchableOpacity, ScrollView, ActivityIndicator } from "react-native";
 import { MaterialIcons } from '@expo/vector-icons';
+import { useFonts } from 'expo-font';
 
+// --- BAGIAN LOGIKA TUGAS ---
+
+// 1. Daftar nama mahasiswa (gantilah dengan daftar nama yang sebenarnya)
+const daftarNama = Array.from({ length: 130 }, (_, i) => `Nama Mahasiswa ${i + 1}`);
+
+// 2. Fungsi untuk mendapatkan nama sebelum dan sesudah urutan tertentu
+const getNamaSekitar = (urutan: number, total: number, sebelum: number, sesudah: number) => {
+  const namaSebelum = [];
+  const namaSesudah = [];
+  const index = urutan - 1; // Ubah urutan 1-based menjadi index 0-based
+
+  // Ambil 5 nama sebelumnya dengan logika circular
+  for (let i = 1; i <= sebelum; i++) {
+    const targetIndex = (index - i + total) % total;
+    namaSebelum.push(daftarNama[targetIndex]);
+  }
+
+  // Ambil 5 nama setelahnya dengan logika circular
+  for (let i = 1; i <= sesudah; i++) {
+    const targetIndex = (index + i) % total;
+    namaSesudah.push(daftarNama[targetIndex]);
+  }
+
+  return { namaSebelum, namaSesudah };
+};
+
+// --- DATA UNTUK NIM KAMU ---
+const NIM_URUTAN = 117; // Tiga digit terakhir NIM
+const TOTAL_NAMA = 130;
+const { namaSebelum, namaSesudah } = getNamaSekitar(NIM_URUTAN, TOTAL_NAMA, 5, 5);
+
+
+// --- KOMPONEN GAMBAR (TIDAK DIUBAH) ---
 const initialGridImages = [
   { id: 1, mainSrc: 'https://picsum.photos/id/10/200', altSrc: 'https://picsum.photos/id/11/200', isFlipped: false, scale: 1 },
   { id: 2, mainSrc: 'https://picsum.photos/id/12/200', altSrc: 'https://picsum.photos/id/13/200', isFlipped: false, scale: 1 },
@@ -14,26 +48,43 @@ const initialGridImages = [
   { id: 9, mainSrc: 'https://picsum.photos/id/26/200', altSrc: 'https://picsum.photos/id/27/200', isFlipped: false, scale: 1 },
 ];
 
+
 export default function Index() {
   const [gridImages, setGridImages] = useState(initialGridImages);
 
-  // Fungsi untuk menangani klik gambar
-  const handleImagePress = (imageId) => {
+  // --- BAGIAN FONT ---
+  // Ganti nama file sesuai dengan font yang di unduh ke folder assets/fonts
+  const [fontsLoaded] = useFonts({
+    // 5 Font Statis
+    'Poppins-Regular': require('../assets/fonts/Poppins-Regular.ttf'),
+    'Poppins-Bold': require('../assets/fonts/Poppins-Bold.ttf'),
+    'Oswald-Regular': require('../assets/fonts/Oswald-Regular.ttf'),
+    'Lato-Regular': require('../assets/fonts/Lato-Regular.ttf'),
+    'Lato-Bold': require('../assets/fonts/Lato-Bold.ttf'),
+    // 5 Font Variabel
+    'RobotoFlex-Variable': require('../assets/fonts/RobotoFlex-VariableFont_GRAD,XOPQ,XTRA,YOPQ,YTAS,YTDE,YTFI,YTLC,YTUC,opsz,slnt,wdth,wght.ttf'),
+    'Inter-Variable': require('../assets/fonts/Inter-VariableFont_opsz,wght.ttf'),
+    'Montserrat-Variable': require('../assets/fonts/Montserrat-VariableFont_wght.ttf'),
+    'SourceSans3-Variable': require('../assets/fonts/SourceSans3-VariableFont_wght.ttf'),
+    'PlayfairDisplay-Variable': require('../assets/fonts/PlayfairDisplay-VariableFont_wght.ttf'),
+  });
+
+  const handleImagePress = (imageId: number) => {
     setGridImages(currentImages =>
       currentImages.map(image => {
         if (image.id === imageId) {
-          // Hitung skala baru dengan batasan maksimal 2x
           const newScale = Math.min(image.scale * 1.2, 2);
-          return {
-            ...image,
-            isFlipped: !image.isFlipped, // Toggle gambar utama/alternatif
-            scale: newScale, // Terapkan scaling
-          };
+          return { ...image, isFlipped: !image.isFlipped, scale: newScale };
         }
         return image;
       })
     );
   };
+
+  // Tampilkan loading jika font belum termuat
+  if (!fontsLoaded) {
+    return <ActivityIndicator size="large" color="#0000ff" />;
+  }
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -56,6 +107,20 @@ export default function Index() {
       </View>
       <View style={styles.blueCircle}></View>
 
+      {/* --- BAGIAN TAMPILAN NAMA (BARU) --- */}
+      <View style={styles.namaContainer}>
+        <Text style={styles.namaHeader}>5 Nama Sebelum (Urutan 117)</Text>
+        {namaSebelum.map((nama, index) => (
+          <Text key={index} style={[styles.namaItem, { fontFamily: 'Poppins-Regular' }]}>{116 - index}. {nama}</Text>
+        ))}
+
+        <Text style={styles.namaHeader}>5 Nama Setelah (Urutan 117)</Text>
+        {namaSesudah.map((nama, index) => (
+          <Text key={index} style={[styles.namaItem, { fontFamily: 'RobotoFlex-Variable', fontWeight: '600' }]}>{118 + index}. {nama}</Text>
+        ))}
+      </View>
+
+
       {/* Grid gambar 3x3 */}
       <View style={styles.gridContainer}>
         {gridImages.map(image => (
@@ -68,10 +133,7 @@ export default function Index() {
               source={{ uri: image.isFlipped ? image.altSrc : image.mainSrc }}
               style={[
                 styles.gridImage,
-                { 
-                  transform: [{ scale: image.scale }],
-                  borderRadius: 8, // Untuk konsistensi dengan sel
-                }
+                { transform: [{ scale: image.scale }], borderRadius: 8 }
               ]}
               resizeMode="cover"
             />
@@ -83,12 +145,14 @@ export default function Index() {
 }
 
 const styles = StyleSheet.create({
+  // ... (semua style lama tetap ada di sini)
   container: {
     flexGrow: 1,
     justifyContent: "flex-start",
     alignItems: "center",
     backgroundColor: "#fff",
     paddingVertical: 60,
+    paddingHorizontal: 20, // Tambah padding horizontal
   },
   rectangle: {
     width: 220,
@@ -165,7 +229,7 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     justifyContent: 'center',
     width: '100%',
-    maxWidth: 330, // Maksimal 3 kolom (100*3 + margin)
+    maxWidth: 330,
     marginTop: 20,
   },
   gridCell: {
@@ -179,5 +243,29 @@ const styles = StyleSheet.create({
   gridImage: {
     width: '100%',
     height: '100%',
-  }
+  },
+  // --- STYLE BARU UNTUK DAFTAR NAMA ---
+  namaContainer: {
+    width: '100%',
+    maxWidth: 330,
+    marginTop: 25,
+    padding: 15,
+    backgroundColor: '#f0f0f0',
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#ddd',
+  },
+  namaHeader: {
+    fontSize: 18,
+    marginBottom: 10,
+    marginTop: 5,
+    fontFamily: 'Poppins-Bold', // Menggunakan font statis
+    color: '#333',
+  },
+  namaItem: {
+    fontSize: 16,
+    paddingVertical: 4,
+    color: '#555',
+    // fontFamily diatur secara inline untuk contoh
+  },
 });
