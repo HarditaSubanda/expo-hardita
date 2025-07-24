@@ -1,11 +1,9 @@
 import React, { useState } from 'react';
 import { Text, View, StyleSheet, Image, TouchableOpacity, ScrollView, ActivityIndicator } from "react-native";
-import { MaterialIcons } from '@expo/vector-icons';
+import { MaterialIcons, FontAwesome, Ionicons, AntDesign } from '@expo/vector-icons';
 import { useFonts } from 'expo-font';
 
-// --- BAGIAN LOGIKA TUGAS ---
 
-// 1. Daftar nama mahasiswa (gantilah dengan daftar nama yang sebenarnya)
 const daftarNama = Array.from({ length: 130 }, (_, i) => {
   const nomor = i + 1;
   switch (nomor) {
@@ -19,7 +17,7 @@ const daftarNama = Array.from({ length: 130 }, (_, i) => {
   }
 });
 
-// 2. Fungsi untuk mendapatkan nama sebelum dan sesudah urutan tertentu
+// Fungsi untuk mendapatkan nama sebelum dan sesudah urutan tertentu
 const getNamaSekitar = (urutan: number, total: number, sebelum: number, sesudah: number) => {
   const namaSebelum = [];
   const namaSesudah = [];
@@ -40,7 +38,7 @@ const getNamaSekitar = (urutan: number, total: number, sebelum: number, sesudah:
   return { namaSebelum, namaSesudah };
 };
 
-// --- DATA UNTUK NIM KAMU ---
+
 const NIM_URUTAN = 117; // Tiga digit terakhir NIM
 const TOTAL_NAMA = 130;
 const { namaSebelum, namaSesudah } = getNamaSekitar(NIM_URUTAN, TOTAL_NAMA, 5, 5);
@@ -60,19 +58,56 @@ const initialGridImages = [
 ];
 
 
+// 1. Data untuk 10 ikon yang berbeda
+const iconData = [
+  { id: 1, family: 'MaterialIcons', name: 'home', text: 'Home', color: '#e74c3c' },
+  { id: 2, family: 'FontAwesome', name: 'star', text: 'Star', color: '#f1c40f' },
+  { id: 3, family: 'Ionicons', name: 'settings', text: 'Settings', color: '#3498db' },
+  { id: 4, family: 'AntDesign', name: 'heart', text: 'Heart', color: '#e91e63' },
+  { id: 5, family: 'MaterialIcons', name: 'camera-alt', text: 'Camera', color: '#9b59b6' },
+  { id: 6, family: 'FontAwesome', name: 'send', text: 'Send', color: '#2ecc71' },
+  { id: 7, family: 'Ionicons', name: 'notifications', text: 'Alerts', color: '#e67e22' },
+  { id: 8, family: 'AntDesign', name: 'user', text: 'Profile', color: '#1abc9c' },
+  { id: 9, family: 'FontAwesome', name: 'folder-open', text: 'Files', color: '#34495e' },
+  { id: 10, family: 'Ionicons', name: 'cart', text: 'Cart', color: '#7f8c8d' },
+];
+
+// 2. Komponen helper untuk merender ikon berdasarkan nama keluarga
+type IconDisplayProps = {
+  family: 'MaterialIcons' | 'FontAwesome' | 'Ionicons' | 'AntDesign';
+  name: string;
+  size: number;
+  color: string;
+};
+
+const IconDisplay = (props: IconDisplayProps) => {
+  const { family, name, size, color } = props;
+  switch (family) {
+    case 'MaterialIcons':
+      return <MaterialIcons name={name as any} size={size} color={color} />;
+    case 'FontAwesome':
+      return <FontAwesome name={name as any} size={size} color={color} />;
+    case 'Ionicons':
+      return <Ionicons name={name as any} size={size} color={color} />;
+    case 'AntDesign':
+      return <AntDesign name={name as any} size={size} color={color} />;
+    default:
+      return null;
+  }
+};
+
+
+
 export default function Index() {
   const [gridImages, setGridImages] = useState(initialGridImages);
 
   // --- BAGIAN FONT ---
-  // Ganti nama file sesuai dengan font yang di unduh ke folder assets/fonts
   const [fontsLoaded] = useFonts({
-    // 5 Font Statis
     'Poppins-Regular': require('../assets/fonts/Poppins-Regular.ttf'),
     'Poppins-Bold': require('../assets/fonts/Poppins-Bold.ttf'),
     'Oswald-Regular': require('../assets/fonts/Oswald-Regular.ttf'),
     'Lato-Regular': require('../assets/fonts/Lato-Regular.ttf'),
     'Lato-Bold': require('../assets/fonts/Lato-Bold.ttf'),
-    // 5 Font Variabel
     'RobotoFlex-Variable': require('../assets/fonts/RobotoFlex-VariableFont_GRAD,XOPQ,XTRA,YOPQ,YTAS,YTDE,YTFI,YTLC,YTUC,opsz,slnt,wdth,wght.ttf'),
     'Inter-Variable': require('../assets/fonts/Inter-VariableFont_opsz,wght.ttf'),
     'Montserrat-Variable': require('../assets/fonts/Montserrat-VariableFont_wght.ttf'),
@@ -81,17 +116,9 @@ export default function Index() {
   });
 
   const namaFonts = [
-  'Poppins-Regular',
-  'Poppins-Bold',
-  'Oswald-Regular',
-  'Lato-Regular',
-  'Lato-Bold',
-  'RobotoFlex-Variable',
-  'Inter-Variable',
-  'Montserrat-Variable',
-  'SourceSans3-Variable',
-  'PlayfairDisplay-Variable',
-];
+    'Poppins-Regular', 'Poppins-Bold', 'Oswald-Regular', 'Lato-Regular', 'Lato-Bold',
+    'RobotoFlex-Variable', 'Inter-Variable', 'Montserrat-Variable', 'SourceSans3-Variable', 'PlayfairDisplay-Variable',
+  ];
 
   const handleImagePress = (imageId: number) => {
     setGridImages(currentImages =>
@@ -105,14 +132,13 @@ export default function Index() {
     );
   };
 
-  // Tampilkan loading jika font belum termuat
   if (!fontsLoaded) {
     return <ActivityIndicator size="large" color="#0000ff" />;
   }
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      {/* Bagian komponen lama tetap sama */}
+      
       <View style={styles.rectangle}>
         <Image
           source={{ uri: "https://upload.wikimedia.org/wikipedia/en/7/7a/Manchester_United_FC_crest.svg" }}
@@ -131,37 +157,41 @@ export default function Index() {
       </View>
       <View style={styles.blueCircle}></View>
 
-      {/* --- BAGIAN TAMPILAN NAMA (BARU) --- */}
+      
       <View style={styles.namaContainer}>
-      <Text style={styles.namaHeader}>5 Nama Sebelum (Urutan 117)</Text>
-      {namaSebelum.map((nama, index) => (
-        <Text
-          key={index}
-          style={[
-            styles.namaItem,
-            { fontFamily: namaFonts[index] }
-          ]}
-        >
-          {116 - index}. {nama}
-        </Text>
-      ))}
-
+        <Text style={styles.namaHeader}>5 Nama Sebelum (Urutan 117)</Text>
+        {namaSebelum.map((nama, index) => (
+          <Text key={index} style={[styles.namaItem, { fontFamily: namaFonts[index] }]}>
+            {116 - index}. {nama}
+          </Text>
+        ))}
         <Text style={styles.namaHeader}>5 Nama Setelah (Urutan 117)</Text>
         {namaSesudah.map((nama, index) => (
-          <Text
-            key={index}
-            style={[
-              styles.namaItem,
-              { fontFamily: namaFonts[index + 5] }
-            ]}
-          >
+          <Text key={index} style={[styles.namaItem, { fontFamily: namaFonts[index + 5] }]}>
             {118 + index}. {nama}
           </Text>
         ))}
       </View>
 
+      {/* --- MULAI BAGIAN BARU: TAMPILAN IKON --- */}
+      <View style={styles.iconSectionContainer}>
+        <Text style={styles.namaHeader}>10 Ikon Berbeda</Text>
+        <View style={styles.iconGridContainer}>
+          {iconData.map(icon => (
+            <View key={icon.id} style={styles.iconCell}>
+              <IconDisplay
+                family={icon.family as 'MaterialIcons' | 'FontAwesome' | 'Ionicons' | 'AntDesign'}
+                name={icon.name}
+                size={40}
+                color={icon.color}
+              />
+              <Text style={styles.iconLabelText}>{icon.text}</Text>
+            </View>
+          ))}
+        </View>
+      </View>
+     
 
-      {/* Grid gambar 3x3 */}
       <View style={styles.gridContainer}>
         {gridImages.map(image => (
           <TouchableOpacity
@@ -171,10 +201,7 @@ export default function Index() {
           >
             <Image
               source={{ uri: image.isFlipped ? image.altSrc : image.mainSrc }}
-              style={[
-                styles.gridImage,
-                { transform: [{ scale: image.scale }], borderRadius: 8 }
-              ]}
+              style={[styles.gridImage, { transform: [{ scale: image.scale }], borderRadius: 8 }]}
               resizeMode="cover"
             />
           </TouchableOpacity>
@@ -192,7 +219,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "#fff",
     paddingVertical: 60,
-    paddingHorizontal: 20, // Tambah padding horizontal
+    paddingHorizontal: 20,
   },
   rectangle: {
     width: 220,
@@ -284,7 +311,6 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
   },
-  // --- STYLE BARU UNTUK DAFTAR NAMA ---
   namaContainer: {
     width: '100%',
     maxWidth: 330,
@@ -299,13 +325,41 @@ const styles = StyleSheet.create({
     fontSize: 18,
     marginBottom: 10,
     marginTop: 5,
-    fontFamily: 'Poppins-Bold', // Menggunakan font statis
+    fontFamily: 'Poppins-Bold',
     color: '#333',
   },
   namaItem: {
     fontSize: 16,
     paddingVertical: 4,
     color: '#555',
-    // fontFamily diatur secara inline untuk contoh
+  },
+  // --- STYLE BARU UNTUK TAMPILAN IKON ---
+  iconSectionContainer: {
+    width: '100%',
+    maxWidth: 330,
+    marginTop: 25,
+    padding: 15,
+    backgroundColor: '#f9f9f9',
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
+    alignItems: 'center',
+  },
+  iconGridContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    width: '100%',
+  },
+  iconCell: {
+    width: '30%', // Membuat 3 kolom
+    alignItems: 'center',
+    marginVertical: 15,
+  },
+  iconLabelText: {
+    marginTop: 8,
+    fontSize: 12,
+    color: '#666',
+    fontFamily: 'Poppins-Regular'
   },
 });
